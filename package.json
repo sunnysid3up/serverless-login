@@ -4,23 +4,30 @@
   "description": "A serverless login app using express, jwt and sequelize.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "export NODE_ENV=development && nodemon app.js",
+    "prod": "export NODE_ENV=production && nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "write-secret": "node getSecret.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.451.0",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
+    "connect-redis": "^3.4.1",
+    "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "express": "^4.16.4",
+    "express-session": "^1.16.1",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
+    "redis": "^2.8.0",
     "sequelize": "^5.8.2"
   }
 }

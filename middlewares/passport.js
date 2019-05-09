@@ -1,22 +1,28 @@
 const passportJWT = require("passport-jwt");
-const CONFIG = require("../config/config");
+const secrets = require("../config/secrets");
+const { getUser } = require("../controllers").utils;
 
-const ExtractJwt = passportJWT.ExtractJwt;
-const JwtStrategy = passportJWT.Strategy;
+const jwtOptions = {
+  jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: secrets[process.env.NODE_ENV].secret,
+  expiresIn: "60",
+  algorithm: "RS256"
+};
 
-const jwtOptions = {};
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-jwtOptions.secretOrKey = CONFIG.jwt_encryption;
-
-// lets create our strategy for web token
-const strategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
-  console.log("payload received", jwt_payload);
-  const user = getUser({ id: jwt_payload.id });
-  if (user) {
-    next(null, user);
-  } else {
-    next(null, false);
+// Create strategy for token
+const jwtStrategy = new passportJWT.Strategy(
+  jwtOptions,
+  (jwt_payload, next) => {
+    console.log("Received payload: ", jwt_payload);
+    const user = getUser({ id: jwt_payload.id });
+    if (user) next(null, user);
+    else next(null, false);
   }
-});
+);
 
-module.exports = { options: jwtOptions, strategy };
+module.exports = {
+  jwt: {
+    jwtOptions,
+    jwtStrategy
+  }
+};

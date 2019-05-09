@@ -1,22 +1,32 @@
 const Sequelize = require("sequelize");
-const CONFIG = require("../config/config");
+const secrets = require("../config/secrets");
 
 const db = {};
 
-// initialze an instance of Sequelize
+// Initialze an instance of Sequelize
 const sequelize = new Sequelize({
-  database: CONFIG.db_name,
-  username: CONFIG.db_user,
-  password: CONFIG.db_password,
+  database: secrets[process.env.NODE_ENV]["rdsConfig"].database,
+  username: secrets[process.env.NODE_ENV]["rdsConfig"].username,
+  password: secrets[process.env.NODE_ENV]["rdsConfig"].password,
   dialect: "mysql",
   logging: false
 });
 
-// check the databse connection
 sequelize
   .authenticate()
-  .then(() => console.log("Connected to:", CONFIG.db_name))
-  .catch(err => console.error("Unable to connect to:", CONFIG.db_name, err));
+  .then(() =>
+    console.log(
+      "Connected to:",
+      secrets[process.env.NODE_ENV]["rdsConfig"].database
+    )
+  )
+  .catch(err =>
+    console.error(
+      "Unable to connect to:",
+      secrets[process.env.NODE_ENV]["rdsConfig"].database,
+      err
+    )
+  );
 
 const User = sequelize.define("user", {
   name: {
@@ -37,9 +47,9 @@ const User = sequelize.define("user", {
   }
 });
 
-User.sync()
-  .then(() => console.log({ message: "Authenticated DB connection" }))
-  .catch(err => console.log({ message: "invalid DB credentials" }));
+User.sync() // sync({ force: true }) deletes and then recreates all tables
+  .then(() => console.log("Synced DB"))
+  .catch(err => console.log("Invalid DB credentials"));
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
